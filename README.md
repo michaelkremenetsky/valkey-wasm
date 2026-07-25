@@ -1,28 +1,40 @@
 # valkey-wasm
 
 Real [Valkey](https://valkey.io) (the BSD-licensed Redis fork) compiled to
-`wasm32-wasip1`, with networking bridged to `node:net` — a drop-in
-`redis://127.0.0.1:6379` server that runs anywhere Node runs, no native Redis
-and no Docker. The Redis twin of what [PGlite](https://pglite.dev) is for
-Postgres.
+`wasm32-wasip1`, with networking bridged to `node:net` — a drop-in Redis server
+that runs anywhere Node runs, no native Redis and no Docker. The Redis twin of
+what [PGlite](https://pglite.dev) is for Postgres.
 
 ## Why
 
-Mocks (`ioredis-mock`) and reimplementations cover the easy 80% of Redis and
-fall over on the exact things production apps need: **BullMQ**'s `EVALSHA`
-script cache, `BZPOPMIN` blocking pops, stream consumer groups (`XREADGROUP`),
-and the Lua `cmsgpack`/`cjson` libraries its scripts serialize with. They also
-only ever hold state inside one JS process, so a spawned worker process sees an
-empty store.
+Sometimes you want Redis without running Redis: a dev setup with no Docker, a CI
+job that shouldn't spin up a service container, tests that want a fresh instance
+per run, an offline demo, an in-browser sandbox, or an edge/serverless context
+where you can't keep a daemon around.
 
-Porting the real engine solves all of it at once and permanently: the RESP
-protocol + Lua 5.1 + `cmsgpack` are a frozen target, so one port serves every
-Redis client library and every version of BullMQ, unmodified, across processes.
+There are two common ways to get there today, and each fits plenty of cases
+well. A mock like `ioredis-mock` is wonderfully quick to drop into a unit test.
+Native Redis or a container gives you the genuine article when you can afford a
+daemon and a port. `valkey-wasm` aims at the middle ground between them: the real
+engine, in-process, with nothing external to manage.
 
-Valkey 9.1.1 reports `redis_version:7.2.4`, so version-gating clients
-(BullMQ requires ≥ 6.2) see a stock 7.2 server. (Every Valkey line from 8.0
-through 9.1 reports the same 7.2.4 compat field, so the port tracks the latest
-release with no client-visible difference.)
+Because it *is* Valkey — the same C, compiled to WebAssembly — you don't have to
+reason about which features are supported. Lua scripting with `cjson`/`cmsgpack`,
+`EVALSHA` script caching, blocking commands (`BLPOP`/`BZPOPMIN`), stream consumer
+groups, pub/sub, transactions: they behave as they do on a server, because they
+*are* the server. Any Redis client (`ioredis`, `node-redis`) connects unmodified
+over a real loopback TCP socket, so state is shared across every process that
+dials the port — which is what lets multi-process tools like **BullMQ** and
+Sidekiq-style workers work the same as they would against a standalone instance.
+
+It also stays low-maintenance: the Redis wire protocol and Lua ABI have been
+stable for years, so one port keeps working across client and framework
+versions. Valkey 9.1.1 reports `redis_version:7.2.4`, so version-gating clients
+(e.g. BullMQ, which needs ≥ 6.2) see a stock 7.2 server — and every Valkey line
+from 8.0 through 9.1 reports that same field, so the port can follow the latest
+upstream release with no client-visible difference.
+
+Think of it as [PGlite](https://pglite.dev) for Redis.
 
 ## Architecture
 
@@ -46,16 +58,3 @@ its event loop via exported `step()`/timer entry points.
    (ioredis,        bridge/            (fd table)         (RESP + Lua +
     BullMQ)      valkey-server.mjs                         data structures)
 ```
-
-## Layout
-
-- `src/`            — vendored pristine Valkey 9.1.1 (first commit is unmodified)
-- `src/wasi/`       — the WASI compat layer (ae backend, conn shim, stubs, reactor entry)
-- `scripts/build.sh`— wasi-sdk build → `build/valkey.wasm`
-- `bridge/`         — the `node:net` host bridge + public JS API
-- `test/`           — `ping` smoke test + the BullMQ Queue→Worker→completed acceptance test
-
-## Status
-
-See `BUILD-STATUS.md`. Milestone order: (1) compiles, (2) links as a reactor,
-(3) `redis-cli ping` over the bridge, (4) BullMQ acceptance test green.
