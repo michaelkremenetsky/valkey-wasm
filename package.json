@@ -1,0 +1,53 @@
+{
+  "name": "valkey-wasm",
+  "version": "0.1.0",
+  "description": "Real Valkey (the BSD-licensed Redis fork) compiled to WebAssembly, networking bridged to node:net — an in-process, Redis-compatible server for Node. PGlite for Redis.",
+  "type": "module",
+  "main": "./dist/valkey-server.js",
+  "types": "./dist/valkey-server.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/valkey-server.d.ts",
+      "import": "./dist/valkey-server.js"
+    }
+  },
+  "files": [
+    "dist",
+    "build/valkey.wasm",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build:ts": "tsc -p tsconfig.json",
+    "build:wasm": "bash scripts/build.sh",
+    "build": "npm run build:wasm && npm run build:ts",
+    "test": "node test/ping.mjs && node test/bullmq.mjs",
+    "prepublishOnly": "npm run build:ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "valkey",
+    "redis",
+    "redis-compatible",
+    "wasm",
+    "webassembly",
+    "in-memory",
+    "embedded",
+    "bullmq",
+    "ioredis",
+    "pglite",
+    "in-process"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelkremenetsky/valkey-wasm.git"
+  },
+  "license": "BSD-3-Clause",
+  "author": "Michael Kremenetsky",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}

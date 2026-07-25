@@ -1,9 +1,10 @@
 # valkey-wasm
 
 Real [Valkey](https://valkey.io) (the BSD-licensed Redis fork) compiled to
-`wasm32-wasip1`, with networking bridged to `node:net` — a drop-in Redis server
-that runs anywhere Node runs, no native Redis and no Docker. The Redis twin of
-what [PGlite](https://pglite.dev) is for Postgres.
+`wasm32-wasip1`, with networking bridged to `node:net` — a drop-in
+`redis://127.0.0.1:6379` server that runs anywhere Node runs, no native Redis
+and no Docker. The Redis twin of what [PGlite](https://pglite.dev) is for
+Postgres.
 
 ## Why
 

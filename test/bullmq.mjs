@@ -2,7 +2,7 @@
 // lifecycle that ioredis-mock cannot run (needs EVALSHA script cache, BZPOPMIN
 // blocking, cmsgpack). Green here means real BullMQ works against valkey-wasm
 // with zero app changes. Run: `npm i bullmq` in this dir first.
-import { ValkeyServer } from '../bridge/valkey-server.mjs';
+import { ValkeyServer } from '../dist/valkey-server.js';
 import { Queue, Worker } from 'bullmq';
 
 const port = 6391;

@@ -2,7 +2,7 @@
 // then speaks raw RESP (PING / SET / GET / EVAL cjson+cmsgpack) with a plain
 // TCP socket — no client library, so it isolates the server + bridge.
 import net from 'node:net';
-import { ValkeyServer } from '../bridge/valkey-server.mjs';
+import { ValkeyServer } from '../dist/valkey-server.js';
 
 const port = 6390;
 const srv = await new ValkeyServer({ port }).start();
