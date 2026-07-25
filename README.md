@@ -3,9 +3,7 @@
 [Valkey](https://valkey.io) (the BSD-licensed fork of Redis) compiled to
 WebAssembly, with its networking wired through Node's `net` module. You get a
 `redis://127.0.0.1:6379` server running inside your Node process, with no native
-Redis install and no Docker.
-
-If you've used [PGlite](https://pglite.dev), it's the same idea for Redis.
+Redis install and no Docker. If you've used [PGlite](https://pglite.dev), it's the same idea for Redis.
 
 ## Why
 
@@ -13,9 +11,6 @@ Sometimes you need Redis for something that shouldn't drag a running Redis into
 it. Local development where you'd rather not run Docker. A CI job that shouldn't
 have to stand up a service container. A test suite that wants a clean database
 on every run. An offline demo, or somewhere you just can't keep a daemon alive.
-
-The usual way to cover that is either a mock or a real server, and each one has
-a catch.
 
 A mock like `ioredis-mock` is easy to reach for, but it reimplements Redis in
 JavaScript. That works for the common commands and falls short on the rest: Lua
