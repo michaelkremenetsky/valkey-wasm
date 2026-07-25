@@ -16,9 +16,7 @@ A mock like `ioredis-mock` is easy to reach for, but it reimplements Redis in
 JavaScript. That works for the common commands and falls short on the rest: Lua
 scripting, `EVALSHA`, blocking commands like `BLPOP`, and streams. It also lives
 entirely inside one process, so the moment you fork a worker, that worker is
-talking to an empty database. A real Redis, or a container running one, does all of it correctly. But then
-you're back to running and managing a daemon and a port, which is usually the
-thing you were trying to get out of.
+talking to an empty database.
 
 valkey-wasm takes a different route. It's the actual Valkey source compiled to
 WebAssembly, running inside your Node process. Since it's the real engine,
