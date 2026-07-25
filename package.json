@@ -1,6 +1,6 @@
 {
   "name": "valkey-wasm",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Real Valkey (the BSD-licensed Redis fork) compiled to WebAssembly, networking bridged to node:net — an in-process, Redis-compatible server for Node. PGlite for Redis.",
   "type": "module",
   "main": "./dist/valkey-server.js",
