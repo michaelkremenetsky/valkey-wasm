@@ -49,6 +49,9 @@
 
 /* Include the best multiplexing layer supported by this system.
  * The following should be ordered by performances, descending. */
+#ifdef HAVE_WASI_AE
+#include "../wasi/ae_wasi.c"   /* valkey-wasm: poll bridged to the host */
+#else
 #ifdef HAVE_EVPORT
 #include "ae_evport.c"
 #else
@@ -62,6 +65,7 @@
 #endif
 #endif
 #endif
+#endif /* valkey-wasm: close HAVE_WASI_AE */
 
 #define AE_LOCK(eventLoop)                                         \
     if ((eventLoop)->flags & AE_PROTECT_POLL) {                    \

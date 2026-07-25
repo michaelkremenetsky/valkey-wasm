@@ -7762,9 +7762,17 @@ __attribute__((weak)) int main(int argc, char **argv) {
     serverSetCpuAffinity(server.server_cpulist);
     setOOMScoreAdj(-1);
 
+#ifdef VALKEY_WASM
+    /* Reactor: do NOT enter the blocking aeMain loop. Init is complete and the
+     * beforeSleep/afterSleep hooks are installed; the host (bridge/) drives one
+     * aeProcessEvents iteration per socket event / timer via reactor rk_step().
+     * Returning here keeps all server globals resident in the wasm instance. */
+    return 0;
+#else
     aeMain(server.el);
     aeDeleteEventLoop(server.el);
     return 0;
+#endif
 }
 
 /*

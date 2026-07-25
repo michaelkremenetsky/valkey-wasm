@@ -1,0 +1,6 @@
+node_modules/
+build/
+*.log
+/tmp/
+test/node_modules/
+test/package*.json
